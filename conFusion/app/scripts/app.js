@@ -1,3 +1,3 @@
 'use strict';
 /*global angular*/
-angular.module('confusionApp', []);
+angular.module('confusionApp', ['ngRoute']);
