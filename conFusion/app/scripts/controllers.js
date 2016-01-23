@@ -58,7 +58,7 @@ angular.module('confusionApp')
     
             console.log($scope.feedback);
     
-            if ($scope.feedback.agree && ($scope.feedback.mychannel == "")) {
+            if ($scope.feedback.agree && ($scope.feedback.mychannel === "")) {
                 $scope.invalidChannelSelection = true;
                 console.log('incorrect');
             }
@@ -74,10 +74,10 @@ angular.module('confusionApp')
         };
     }])
 
-    .controller('DishDetailController', ['$scope', '$routeParams', 'menuFactory', 
-        function($scope, $routeParams, menuFactory) {
+    .controller('DishDetailController', ['$scope', '$stateParams', 'menuFactory', 
+        function($scope, $stateParams, menuFactory) {
         
-        var dish = menuFactory.getDish(parseInt($routeParams.id, 10));
+        var dish = menuFactory.getDish(parseInt($stateParams.id, 10));
 
         $scope.dish = dish;
     
@@ -109,6 +109,22 @@ angular.module('confusionApp')
             $scope.comment = createEmptyComment();
         };
 
+    }])
+    
+    .controller('IndexController', ['$scope', 'menuFactory', 'corporateFactory', 
+        function ($scope, menuFactory, corporateFactory) {
+        
+        $scope.dish = menuFactory.getDish(0);
+        
+        $scope.promotion = menuFactory.getPromotion(0);
+        
+        $scope.executiveChief = corporateFactory.getLeader(3);
+    }])
+    
+    .controller('AboutController', ['$scope', 'corporateFactory', function ($scope, corporateFactory) {
+        
+        $scope.leaders = corporateFactory.getLeaders();
+        
     }])
     
     ;

@@ -30,7 +30,7 @@ module.exports = function (grunt) {
         },
 
         useminPrepare: {
-            html: 'app/menu.html',
+            html: 'app/index.html',
             options: {
                 dest: 'dist'
             }
@@ -120,7 +120,7 @@ module.exports = function (grunt) {
                 tasks: [ 'build' ]
             },
             scripts: {
-                files: ['app/scripts/app.js'],
+                files: ['app/scripts/*.js'],
                 tasks:[ 'build']
             },
             styles: {
@@ -130,58 +130,42 @@ module.exports = function (grunt) {
             livereload: {
                 options: {
                     livereload: '<%= connect.options.livereload %>'
+                    //livereload: true
                 },
                 files: [
                     'app/{,*/}*.html',
                     '.tmp/styles/{,*/}*.css',
-                    'app/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
+                    'app/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
+                    'app/**/*.{}'
                 ]
             }
         },
         
-        //
-        // !!! ATENÇÂO, ATTENTION !!!
-        // To run on Cloud9 (ide.c9.io) is necessary to modify PORT and HOSTNAME.
         connect: {
-          options: {        
-            port: 8080,
-            // Change this to '0.0.0.0' to access the server from outside.
-            hostname: '0.0.0.0',
-            livereload: 8081
-          },
-          
-        /*  
-        connect: {
-          options: {
-            port: 9000,
-            // Change this to '0.0.0.0' to access the server from outside.
-            hostname: 'localhost',
-            livereload: 35729
-          },
-          */
-          
-          dist: {
-            options: {
-              open: true,
-              base:{
-                   path: 'dist',
+                options:{
+                    port: 8080,
+                    hostname: "0.0.0.0",
+                    livereload: 8081
+                },
+            dist: {
                 options: {
-                    index: 'menu.html',
-                    maxAge: 300000
+                    open: true,
+                    base: {
+                        path: 'dist',
+                        options: {
+                            index: 'index.html',
+                            maxAge: 10000
+                        }
+                    }
                 }
-              }
             }
-          }
         },
-
         
         clean: {
             build: {
                 src: [ 'dist/']
             }
         },
-        
-        
     });
     
     grunt.registerTask('build', [
@@ -193,7 +177,7 @@ module.exports = function (grunt) {
         'uglify',
         'copy',
         'filerev',
-        'usemin'
+        'usemin' 
     ]);
     
     grunt.registerTask('serve',['build','connect:dist','watch']);
