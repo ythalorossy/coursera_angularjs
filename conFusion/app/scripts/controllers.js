@@ -2,13 +2,24 @@
 /*global angular*/
 angular.module('confusionApp')
 
-    .controller('MenuController', ['$scope', 'menuFactory', function($scope, menuFactory) {
+    .controller('MenuController', ['$scope', 'menuFactory', 
+        function($scope, menuFactory) {
 
         $scope.tab = 1;
         $scope.filtText = '';
         $scope.showDetails = false;
+        $scope.showMenu = false;
+        $scope.message = "Loading...";  
         
-        $scope.dishes = menuFactory.getDishes(); 
+        $scope.dishes = menuFactory.getDishes().query(
+          function (response) {
+            $scope.dishes = response;
+            $scope.showMenu = true;
+          },
+          function (response) {
+            $scope.message = "Error: " + response.status + " " + response.statusText;
+          }
+        );
 
         $scope.select = function(setTab) {
             $scope.tab = setTab;
@@ -25,39 +36,39 @@ angular.module('confusionApp')
                 $scope.filtText = "";
             }
         };
-        
+
         $scope.isSelected = function (checkTab) {
             return ($scope.tab === checkTab);
         };
-        
+
         $scope.toggleDetails = function () {
             $scope.showDetails = !$scope.showDetails;
         };
     }])
-    
+
     .controller("ContactController", ['$scope', function($scope){
         $scope.feedback = {
-            mychannel:"", 
-            firstName:"", 
-            lastName:"", 
-            agree:false, 
+            mychannel:"",
+            firstName:"",
+            lastName:"",
+            agree:false,
             email:""
         };
-        
+
         var channels = [
             {value: "tel", label: "Tel"},
             {value: "Email", label: "Email"}];
-        
+
         $scope.channels = channels;
         $scope.invalidChannelSelection = false;
     }])
 
     .controller("FeedbackController", ['$scope', function($scope){
-        
+
         $scope.sendFeedback = function() {
-    
+
             console.log($scope.feedback);
-    
+
             if ($scope.feedback.agree && ($scope.feedback.mychannel === "")) {
                 $scope.invalidChannelSelection = true;
                 console.log('incorrect');
@@ -67,41 +78,57 @@ angular.module('confusionApp')
                 $scope.feedback = {mychannel:"", firstName:"", lastName:"",
                                    agree:false, email:"" };
                 $scope.feedback.mychannel="";
-    
+
                 $scope.feedbackForm.$setPristine();
                 console.log($scope.feedback);
             }
         };
     }])
 
-    .controller('DishDetailController', ['$scope', '$stateParams', 'menuFactory', 
+    .controller('DishDetailController', ['$scope', '$stateParams', 'menuFactory',
         function($scope, $stateParams, menuFactory) {
-        
-        var dish = menuFactory.getDish(parseInt($stateParams.id, 10));
 
-        $scope.dish = dish;
-    
+          $scope.showDish = false;
+          $scope.message = "Loading...";  
+          $scope.dish = menuFactory.getDishes()
+            .get({id:parseInt($stateParams.id, 10)})
+            .$promise.then(
+              function (response) {
+                $scope.dish = response;
+                $scope.showDish = true
+              }, 
+              function (response) {
+                $scope.message = "Error: " + response.status + " " + response.statusText;
+              }
+          );
     }])
-    
-    .controller('DishCommentController', ['$scope', function ($scope) {
-        
+
+    .controller('DishCommentController', ['$scope', 'menuFactory', function ($scope, menuFactory) {
+
         // Create a new Comment
         var createEmptyComment = function () {
-            return { rating: 5, comment: "", author: "", date: new Date() };
+            return { 
+              rating: 5, 
+              comment: "", 
+              author: "", 
+              date: ""
+            };
         };
-        
+
         $scope.comment = createEmptyComment();
 
         $scope.submitComment = function () {
-            
+
             // Convert rating to Integer
             $scope.comment.rating = parseInt($scope.comment.rating, 10);
             // Update Date
-            $scope.comment.date = new Date();
-            
+            $scope.comment.date = new Date().toISOString();
+
             // Pushing new comment into comments of dish
             $scope.dish.comments.push($scope.comment);
             
+            menuFactory.getDishes().update({id:$scope.dish.id}, $scope.dish);
+          
             // Reset feedback form to pristine
             $scope.commentForm.$setPristine();
 
@@ -110,21 +137,33 @@ angular.module('confusionApp')
         };
 
     }])
-    
-    .controller('IndexController', ['$scope', 'menuFactory', 'corporateFactory', 
+
+    .controller('IndexController', ['$scope', 'menuFactory', 'corporateFactory',
         function ($scope, menuFactory, corporateFactory) {
+
+        $scope.showDish = false;
+        $scope.message = "Loading...";
+
+        $scope.dish = menuFactory.getDishes()
+          .get({id: 0})
+          .$promise.then(
+            function (response) {
+              $scope.dish = response;
+              $scope.showDish = true; 
+            },
+            function (response) {
+              $scope.message = "Error: " + response.status + " " + response.statusText;
+            }
+        );
         
-        $scope.dish = menuFactory.getDish(0);
-        
-        $scope.promotion = menuFactory.getPromotion(0);
-        
+          $scope.promotion = menuFactory.getPromotion(0);
         $scope.executiveChief = corporateFactory.getLeader(3);
     }])
-    
-    .controller('AboutController', ['$scope', 'corporateFactory', function ($scope, corporateFactory) {
-        
+
+    .controller('AboutController', ['$scope', 'corporateFactory', 
+                                    function ($scope, corporateFactory) {
+
         $scope.leaders = corporateFactory.getLeaders();
-        
     }])
-    
+
     ;
