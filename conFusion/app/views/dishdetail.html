@@ -27,9 +27,9 @@
                 <h3>Customer comments</h3>
                 <p>
                     <label for="search">Sort by</label>
-                    <input type="text" id="search" ng-model="commentSearch">
+                    <input type="text" id="search" ng-model="orderText">
                 </p>
-                <blockquote ng-repeat="comment in dish.comments | orderBy:commentSearch">
+                <blockquote ng-repeat="comment in dish.comments | orderBy:orderText">
                     <p>{{comment.rating}} Stars</p>
                     <p>{{comment.comment}}</p>
                     <footer>
