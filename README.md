@@ -1,1 +1,1 @@
-# coursera_angularjs
+# Coursera Client Side using Angular.js
